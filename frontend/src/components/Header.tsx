@@ -71,34 +71,40 @@ export function Header({
         borderBottom: '1px solid var(--border)'
       }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-5">
+      <div className="max-w-6xl mx-auto px-4 py-3 sm:px-6 sm:py-5">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-end justify-between gap-4"
+          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4"
         >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <Clapperboard size={24} style={{ color: 'var(--accent)' }} />
-              <h1
-                className="text-2xl font-bold tracking-tight"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                XZstudio
-              </h1>
-              <span
-                className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wider"
-                style={{
-                  background: 'var(--accent-soft)',
-                  color: 'var(--text-muted)'
-                }}
-              >
-                v3.0
-              </span>
+          <div className="w-full sm:w-auto">
+            <div className="flex items-center justify-between sm:justify-start gap-3 mb-3 sm:mb-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Clapperboard size={20} className="sm:w-6 sm:h-6" style={{ color: 'var(--accent)' }} />
+                <h1
+                  className="text-xl sm:text-2xl font-bold tracking-tight"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  XZstudio
+                </h1>
+                <span
+                  className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wider hidden sm:inline-block"
+                  style={{
+                    background: 'var(--accent-soft)',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  v3.0
+                </span>
+              </div>
+              {/* 移动端：主题切换放在标题栏右侧 */}
+              <div className="sm:hidden">
+                <ThemeSwitcher />
+              </div>
             </div>
 
-            {/* 标签页切换 - 优化样式 */}
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* 标签页切换 - 移动端横向滚动 */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
               {(Object.keys(TAB_CONFIG) as TabType[]).map((tab) => {
                 const config = TAB_CONFIG[tab]
                 const Icon = config.icon
@@ -112,8 +118,8 @@ export function Header({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={`
-                      relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
-                      border transition-all duration-200
+                      relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium
+                      border transition-all duration-200 whitespace-nowrap shrink-0
                       ${isActive
                         ? `${config.activeBg} ${config.activeColor}`
                         : `border-transparent ${config.hoverBg}`
@@ -156,8 +162,8 @@ export function Header({
             </div>
           </div>
 
-          {/* 右侧：主题切换 + 状态信息 */}
-          <div className="flex items-center gap-4">
+          {/* 右侧：主题切换 + 状态信息（桌面端） */}
+          <div className="hidden sm:flex items-center gap-4 shrink-0">
             <ThemeSwitcher />
             {lastUpdate && (
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>

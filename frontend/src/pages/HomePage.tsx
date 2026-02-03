@@ -83,7 +83,7 @@ export function HomePage() {
       />
 
       {/* Main Content */}
-      <main className="relative max-w-6xl mx-auto px-6 py-8">
+      <main className="relative max-w-6xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
         {/* 错误提示 */}
         <AnimatePresence>
           {error && (
@@ -100,7 +100,7 @@ export function HomePage() {
 
         {/* 选题列表 */}
         {displayedTopics.length > 0 ? (
-          <div className="grid gap-5">
+          <div className="grid gap-4 sm:gap-5">
             {displayedTopics.map((topic, index) => (
               <TopicCard
                 key={topic.id}
@@ -150,10 +150,10 @@ export function HomePage() {
 
       {/* Footer */}
       <footer
-        className="relative max-w-6xl mx-auto px-6 py-8 mt-8"
+        className="relative max-w-6xl mx-auto px-4 py-6 mt-6 sm:px-6 sm:py-8 sm:mt-8"
         style={{ borderTop: '1px solid var(--border)' }}
       >
-        <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-center sm:text-left" style={{ color: 'var(--text-muted)' }}>
           <p>XZstudio v3.0</p>
           <p>数据来源: 影视美食 · 名店配方 · 考古美食</p>
         </div>

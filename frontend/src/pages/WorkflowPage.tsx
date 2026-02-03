@@ -156,25 +156,27 @@ export function WorkflowPage() {
           background: 'color-mix(in srgb, var(--bg-primary) 80%, transparent)'
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 transition-colors"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <ArrowLeft size={18} />
-              <span className="text-sm">返回上一页</span>
+              <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="text-xs sm:text-sm">返回</span>
             </button>
-            <div className="text-right">
-              <h1 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                《{topic.work_name}》· {topic.recommended_dish}
+            <div className="text-right flex-1 ml-4 min-w-0">
+              <h1 className="text-sm sm:text-lg font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                <span className="hidden sm:inline">《{topic.work_name}》· </span>
+                <span className="sm:hidden">{topic.recommended_dish}</span>
+                <span className="hidden sm:inline">{topic.recommended_dish}</span>
               </h1>
             </div>
           </div>
 
           {/* Stepper */}
-          <div className="pb-8 pt-2">
+          <div className="pb-6 sm:pb-8 pt-1 sm:pt-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
             <WorkflowStepper
               steps={steps}
               currentStep={currentStep}
@@ -185,7 +187,7 @@ export function WorkflowPage() {
       </header>
 
       {/* Main Content */}
-      <main className="relative max-w-4xl mx-auto px-6 py-8">
+      <main className="relative max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

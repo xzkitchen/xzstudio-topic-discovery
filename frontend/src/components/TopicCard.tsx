@@ -105,9 +105,9 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
       className="card-elegant overflow-hidden"
     >
       {/* 顶部区域：海报 + 基础信息 */}
-      <div className="flex gap-5 p-5">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5">
         {/* 海报/封面 - 根据类型显示不同样式 */}
-        <div className="w-24 h-36 rounded-lg overflow-hidden shrink-0 relative">
+        <div className="w-20 h-28 sm:w-24 sm:h-36 rounded-lg overflow-hidden shrink-0 relative">
           {/* 影视美食 - 使用 TMDB 海报 */}
           {topicType === 'movie_food' && (
             topic.poster_url ? (
@@ -182,7 +182,7 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
               </div>
 
               {/* 标题 - 根据类型显示不同内容 */}
-              <h2 className="text-xl font-semibold text-white leading-tight mb-2 group-hover:text-amber-400 transition-colors">
+              <h2 className="text-base sm:text-xl font-semibold text-white leading-tight mb-2 group-hover:text-amber-400 transition-colors">
                 {topicType === 'famous_recipe' && topic.restaurant_name ? (
                   topic.restaurant_name
                 ) : topicType === 'archaeological' && topic.year_origin ? (
@@ -260,11 +260,11 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
             </div>
 
             {/* 操作按钮区：开始制作 + Pass + 收藏 + 已做标记 */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               {topic.is_done ? (
-                <div className="px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
-                  <span className="text-xs text-green-400 flex items-center gap-1">
-                    <Check size={12} />
+                <div className="px-2 sm:px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                  <span className="text-[10px] sm:text-xs text-green-400 flex items-center gap-1">
+                    <Check size={10} className="sm:w-3 sm:h-3" />
                     已做过
                   </span>
                 </div>
@@ -272,10 +272,10 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
                 /* 开始制作按钮 */
                 <button
                   onClick={() => onStartWorkflow(topic.id)}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-colors text-xs font-medium flex items-center gap-1.5"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 active:bg-amber-500/30 transition-colors text-[10px] sm:text-xs font-medium flex items-center gap-1 sm:gap-1.5"
                 >
-                  <Play size={14} />
-                  开始制作
+                  <Play size={12} className="sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden xs:inline">开始</span>制作
                 </button>
               )}
 
@@ -283,12 +283,12 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
               <div className="relative">
                 <button
                   onClick={() => setShowSkipMenu(!showSkipMenu)}
-                  className="p-2 rounded-lg hover:bg-white/5 transition-colors group"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors group"
                   title="跳过这个选题"
                 >
                   <X
-                    size={18}
-                    className="text-zinc-500 group-hover:text-red-400 transition-colors"
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px] text-zinc-500 group-hover:text-red-400 transition-colors"
                   />
                 </button>
 
@@ -331,29 +331,29 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
               {/* 收藏按钮 */}
               <button
                 onClick={handleFavorite}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
                 title={topic.is_favorited ? '取消收藏' : '收藏'}
               >
                 <Heart
-                  size={18}
-                  className={
+                  size={16}
+                  className={`sm:w-[18px] sm:h-[18px] ${
                     topic.is_favorited
                       ? 'fill-red-400 text-red-400'
                       : 'text-zinc-500 hover:text-zinc-300'
-                  }
+                  }`}
                 />
               </button>
             </div>
           </div>
 
           {/* 推荐菜品 + 难度 */}
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2">
-              <UtensilsCrossed size={14} className="text-amber-400" />
-              <span className="text-sm font-medium text-white">{topic.recommended_dish}</span>
+          <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <UtensilsCrossed size={12} className="sm:w-3.5 sm:h-3.5 text-amber-400" />
+              <span className="text-xs sm:text-sm font-medium text-white">{topic.recommended_dish}</span>
             </div>
-            <span className={`px-2 py-0.5 rounded-full text-xs border ${difficultyColors[topic.cooking_difficulty] || difficultyColors['中等']}`}>
-              <ChefHat size={10} className="inline mr-1" />
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs border ${difficultyColors[topic.cooking_difficulty] || difficultyColors['中等']}`}>
+              <ChefHat size={10} className="inline mr-0.5 sm:mr-1" />
               {topic.cooking_difficulty}
             </span>
           </div>
@@ -361,22 +361,22 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
       </div>
 
       {/* 美食场景/描述 */}
-      <div className="px-5 pb-4">
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+      <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+        <div className="p-3 sm:p-4 rounded-xl bg-white/[0.02] border border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-              <Film size={12} />
+            <h3 className="text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+              <Film size={10} className="sm:w-3 sm:h-3" />
               {topicType === 'famous_recipe' ? '配方亮点' :
                topicType === 'archaeological' ? '历史背景' : '美食场景'}
             </h3>
             {topic.food_scene_timestamp && (
-              <span className="text-xs text-amber-400/80 flex items-center gap-1">
+              <span className="text-[10px] sm:text-xs text-amber-400/80 flex items-center gap-1">
                 <Clock size={10} />
                 {topic.food_scene_timestamp}
               </span>
             )}
           </div>
-          <p className="text-sm text-zinc-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             {topic.food_scene_description}
           </p>
         </div>
@@ -384,18 +384,18 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
 
       {/* 名店配方专用：主厨信息 */}
       {topicType === 'famous_recipe' && topic.chef_name && (
-        <div className="px-5 pb-4">
-          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
-            <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <ChefHat size={12} />
+        <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+          <div className="p-3 sm:p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+            <h3 className="text-[10px] sm:text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 sm:gap-2">
+              <ChefHat size={10} className="sm:w-3 sm:h-3" />
               主厨
             </h3>
-            <p className="text-sm text-white font-medium">{topic.chef_name}</p>
+            <p className="text-xs sm:text-sm text-white font-medium">{topic.chef_name}</p>
             {topic.chef_background && (
-              <p className="text-sm text-zinc-400 mt-1">{topic.chef_background}</p>
+              <p className="text-xs sm:text-sm text-zinc-400 mt-1">{topic.chef_background}</p>
             )}
             {topic.restaurant_story && (
-              <p className="text-xs text-zinc-500 mt-2 italic">{topic.restaurant_story}</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500 mt-2 italic">{topic.restaurant_story}</p>
             )}
           </div>
         </div>
@@ -403,52 +403,52 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
 
       {/* 考古美食专用：史料来源 */}
       {topicType === 'archaeological' && topic.historical_source && (
-        <div className="px-5 pb-4">
-          <div className="p-4 rounded-xl bg-violet-500/5 border border-violet-500/20">
-            <h3 className="text-xs font-semibold text-violet-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <BookOpen size={12} />
+        <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+          <div className="p-3 sm:p-4 rounded-xl bg-violet-500/5 border border-violet-500/20">
+            <h3 className="text-[10px] sm:text-xs font-semibold text-violet-400 uppercase tracking-wider mb-2 flex items-center gap-1.5 sm:gap-2">
+              <BookOpen size={10} className="sm:w-3 sm:h-3" />
               史料来源
             </h3>
-            <p className="text-sm text-white">{topic.historical_source}</p>
+            <p className="text-xs sm:text-sm text-white">{topic.historical_source}</p>
             {topic.historical_source_url && (
               <a
                 href={topic.historical_source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-violet-400 hover:underline mt-2 inline-flex items-center gap-1"
+                className="text-[10px] sm:text-xs text-violet-400 hover:underline mt-2 inline-flex items-center gap-1"
               >
                 <ExternalLink size={10} />
                 查看原始文献
               </a>
             )}
             {topic.cultural_context && (
-              <p className="text-xs text-zinc-500 mt-2">{topic.cultural_context}</p>
+              <p className="text-[10px] sm:text-xs text-zinc-500 mt-2">{topic.cultural_context}</p>
             )}
             {topic.historical_figure && (
-              <p className="text-xs text-zinc-400 mt-1">相关人物：{topic.historical_figure}</p>
+              <p className="text-[10px] sm:text-xs text-zinc-400 mt-1">相关人物：{topic.historical_figure}</p>
             )}
           </div>
         </div>
       )}
 
       {/* 故事切入点 */}
-      <div className="px-5 pb-4">
-        <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <Lightbulb size={12} />
+      <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+        <h3 className="text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
+          <Lightbulb size={10} className="sm:w-3 sm:h-3" />
           故事切入点
         </h3>
         <div className="grid gap-2">
           {displayedAngles.map((angle, i) => (
             <div
               key={`${angle.title}-${i}`}
-              className={`p-3 rounded-lg border ${angleTypeColors[angle.angle_type] || angleTypeColors['其他']}`}
+              className={`p-2.5 sm:p-3 rounded-lg border ${angleTypeColors[angle.angle_type] || angleTypeColors['其他']}`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium">{angle.angle_type}</span>
-                <span className="text-xs opacity-60">{angle.potential_score}分</span>
+                <span className="text-[10px] sm:text-xs font-medium">{angle.angle_type}</span>
+                <span className="text-[10px] sm:text-xs opacity-60">{angle.potential_score}分</span>
               </div>
-              <p className="text-sm font-medium text-white mb-1">{angle.title}</p>
-              <p className="text-xs text-zinc-400">{angle.description}</p>
+              <p className="text-xs sm:text-sm font-medium text-white mb-1">{angle.title}</p>
+              <p className="text-[10px] sm:text-xs text-zinc-400">{angle.description}</p>
             </div>
           ))}
         </div>
@@ -456,25 +456,25 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
 
       {/* 开场钩子 */}
       {topic.opening_hooks && topic.opening_hooks.length > 0 && (
-        <div className="px-5 pb-4">
-          <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Sparkles size={12} />
+        <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+          <h3 className="text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
+            <Sparkles size={10} className="sm:w-3 sm:h-3" />
             开场钩子参考
           </h3>
           <div className="grid gap-2">
             {topic.opening_hooks.map((hook, i) => (
               <div
                 key={i}
-                className={`p-3 rounded-lg border ${hookTypeColors[hook.type] || 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}
+                className={`p-2.5 sm:p-3 rounded-lg border ${hookTypeColors[hook.type] || 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10">
+                  <span className="text-[9px] sm:text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10">
                     {hook.type}
                   </span>
                 </div>
-                <p className="text-sm text-zinc-200 leading-relaxed">"{hook.content}"</p>
+                <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed">"{hook.content}"</p>
                 {hook.source && (
-                  <p className="text-[10px] text-zinc-500 mt-1">来源: {hook.source}</p>
+                  <p className="text-[9px] sm:text-[10px] text-zinc-500 mt-1">来源: {hook.source}</p>
                 )}
               </div>
             ))}
@@ -483,44 +483,44 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
       )}
 
       {/* 画面素材 + 三有评分 */}
-      <div className="px-5 pb-4">
-        <div className="flex flex-wrap items-center gap-4 text-xs">
+      <div className="px-4 sm:px-5 pb-3 sm:pb-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[10px] sm:text-xs">
           {/* 画面素材 */}
           {topic.footage_sources && topic.footage_sources.length > 0 && (
-            <div className="flex items-center gap-2 text-zinc-400">
-              <Video size={12} />
+            <div className="flex items-center gap-1.5 sm:gap-2 text-zinc-400">
+              <Video size={10} className="sm:w-3 sm:h-3" />
               <span>{topic.footage_sources.join(' · ')}</span>
             </div>
           )}
         </div>
 
         {/* 三有评分 */}
-        <div className="flex flex-wrap items-center gap-3 mt-3">
-          <span className={`flex items-center gap-1 text-xs ${topic.is_interesting ? 'text-amber-400' : 'text-zinc-600'}`}>
-            <Flame size={12} />
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
+          <span className={`flex items-center gap-1 text-[10px] sm:text-xs ${topic.is_interesting ? 'text-amber-400' : 'text-zinc-600'}`}>
+            <Flame size={10} className="sm:w-3 sm:h-3" />
             {topic.is_interesting ? '✓' : '○'} 有趣
           </span>
-          <span className={`flex items-center gap-1 text-xs ${topic.is_discussable ? 'text-amber-400' : 'text-zinc-600'}`}>
-            <MessageCircle size={12} />
+          <span className={`flex items-center gap-1 text-[10px] sm:text-xs ${topic.is_discussable ? 'text-amber-400' : 'text-zinc-600'}`}>
+            <MessageCircle size={10} className="sm:w-3 sm:h-3" />
             {topic.is_discussable ? '✓' : '○'} 有话题
           </span>
-          <span className={`flex items-center gap-1 text-xs ${topic.has_momentum ? 'text-amber-400' : 'text-zinc-600'}`}>
-            <TrendingUp size={12} />
+          <span className={`flex items-center gap-1 text-[10px] sm:text-xs ${topic.has_momentum ? 'text-amber-400' : 'text-zinc-600'}`}>
+            <TrendingUp size={10} className="sm:w-3 sm:h-3" />
             {topic.has_momentum ? '✓' : '○'} 有热点
           </span>
         </div>
       </div>
 
       {/* 底部：外部链接 + 收集时间 */}
-      <div className="px-5 py-4 border-t border-white/5 flex items-center justify-between">
+      <div className="px-4 sm:px-5 py-3 sm:py-4 border-t border-white/5 flex items-center justify-between">
         {topicType === 'movie_food' && (
           <a
             href={topic.douban_url || `https://movie.douban.com/subject_search?search_text=${encodeURIComponent(topic.work_name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-amber-400 transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-zinc-500 hover:text-amber-400 active:text-amber-500 transition-colors"
           >
-            <ExternalLink size={12} />
+            <ExternalLink size={10} className="sm:w-3 sm:h-3" />
             豆瓣详情
           </a>
         )}
@@ -529,9 +529,9 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
             href={topic.recipe_source_url || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-amber-400 transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-zinc-500 hover:text-amber-400 active:text-amber-500 transition-colors"
           >
-            <ExternalLink size={12} />
+            <ExternalLink size={10} className="sm:w-3 sm:h-3" />
             {topic.recipe_source_url ? '官方配方' : '暂无链接'}
           </a>
         )}
@@ -540,14 +540,14 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
             href={topic.historical_source_url || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-violet-400 transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-zinc-500 hover:text-violet-400 active:text-violet-500 transition-colors"
           >
-            <ExternalLink size={12} />
+            <ExternalLink size={10} className="sm:w-3 sm:h-3" />
             {topic.historical_source_url ? '史料原文' : '暂无链接'}
           </a>
         )}
 
-        <span className="text-[10px] text-zinc-600">
+        <span className="text-[9px] sm:text-[10px] text-zinc-600">
           {new Date(topic.collected_at).toLocaleString('zh-CN', {
             month: 'short',
             day: 'numeric',
