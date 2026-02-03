@@ -2,7 +2,7 @@
 set -e
 
 # 设置默认端口
-export PORT=${PORT:-80}
+export PORT=${PORT:-8080}
 
 # 用环境变量替换 nginx 配置中的端口（直接覆盖主配置）
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
