@@ -1,15 +1,42 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, ChefHat, ExternalLink, Play, Clock, Users, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChefHat, ExternalLink, Play, Clock, Users, Check, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
 import type { TopicCandidate } from '../../types'
 
+// 旧格式步骤（兼容现有数据）
+interface LegacyStep {
+  id: string
+  title: string
+  description: string      // 旧格式用单个描述
+  duration?: string
+  tips?: string            // 旧格式用单个提示
+}
+
+// 新格式详细步骤
+interface DetailedStep {
+  id: string
+  title: string
+  duration?: string
+  details: string[]        // 详细操作步骤列表
+  ingredients?: string[]   // 这一步用到的食材和用量
+  tips?: string[]          // 注意事项列表
+  warnings?: string[]      // 常见错误提醒
+}
+
+// 运行时使用的完整步骤类型
 interface CookingStep {
   id: string
   title: string
-  description: string
-  duration?: string  // 预计时间
-  tips?: string      // 小贴士
+  duration?: string
+  details: string[]
+  ingredients?: string[]
+  tips?: string[]
+  warnings?: string[]
   completed: boolean
+  expanded: boolean
 }
+
+// 数据可以是旧格式或新格式
+type RawStep = LegacyStep | Omit<DetailedStep, 'completed' | 'expanded'>
 
 interface VideoTutorial {
   title: string
@@ -26,15 +53,101 @@ interface StepCookingProps {
   stepData: Record<string, unknown>
 }
 
-// 菜品教程数据库 - 只存储步骤，视频链接动态生成搜索URL
-const DISH_STEPS: Record<string, Omit<CookingStep, 'completed'>[]> = {
+// 烹饪教程数据库 - 支持旧格式和新格式的步骤数据
+const DETAILED_DISH_STEPS: Record<string, RawStep[]> = {
   '普罗旺斯炖蔬菜': [
-    { id: '1', title: '准备蔬菜', description: '茄子、西葫芦、黄西葫芦、番茄各切成约2-3mm厚的薄片', duration: '15分钟', tips: '切片厚度要尽量一致，这样烤的时候才能均匀熟透' },
-    { id: '2', title: '制作番茄酱底', description: '洋葱切碎，大蒜切末，用橄榄油炒软后加入番茄膏和少许水，调味', duration: '10分钟', tips: '酱底不要太稀，要能挂在勺子上' },
-    { id: '3', title: '摆盘', description: '将番茄酱底铺在烤盘底部，蔬菜片按颜色交替排列成同心圆', duration: '20分钟', tips: '这是最考验耐心的步骤，排列整齐会让成品更好看' },
-    { id: '4', title: '调味', description: '淋上橄榄油，撒上百里香、盐和黑胡椒', duration: '5分钟', tips: '百里香用新鲜的最好，没有的话干百里香也行' },
-    { id: '5', title: '烘烤', description: '盖上锡纸，180°C烤45分钟，然后揭开锡纸再烤15分钟上色', duration: '60分钟', tips: '每个烤箱脾气不同，注意观察颜色' },
-    { id: '6', title: '摆盘装饰', description: '出炉后撒上新鲜罗勒叶，淋少许橄榄油即可', duration: '2分钟' },
+    {
+      id: '1',
+      title: '准备蔬菜',
+      duration: '15分钟',
+      ingredients: ['茄子 1根（约200g）', '绿西葫芦 1根', '黄西葫芦 1根', '番茄 2个（熟透的）'],
+      details: [
+        '茄子不用削皮，洗净后用厨房纸擦干',
+        '用锋利的刀把茄子切成 2-3mm 厚的圆片，厚度要均匀',
+        '西葫芦同样切成 2-3mm 的圆片',
+        '番茄切片前先用开水烫30秒去皮会更好，然后切同样厚度',
+        '所有切片按颜色分开放好，待用'
+      ],
+      tips: ['切片厚度一致是关键，否则烤的时候有的糊了有的还没熟', '如果刀不够锋利，蔬菜容易被压扁变形'],
+      warnings: ['不要切太薄（<2mm），会烤焦变脆']
+    },
+    {
+      id: '2',
+      title: '制作番茄酱底',
+      duration: '10分钟',
+      ingredients: ['洋葱 半个', '大蒜 3瓣', '番茄膏 2大勺', '橄榄油 2大勺', '水 50ml', '盐 适量', '黑胡椒 适量'],
+      details: [
+        '洋葱切成细碎的小丁（越细越好，口感会更顺滑）',
+        '大蒜切成蒜末',
+        '锅里倒橄榄油，小火加热',
+        '下洋葱丁，慢慢炒 3-4 分钟直到变透明变软',
+        '加入蒜末，再炒 30 秒闻到香味',
+        '加入番茄膏，翻炒 1 分钟让它微微上色',
+        '倒入水，搅拌均匀，加盐和黑胡椒调味',
+        '小火煮 2 分钟让酱汁稍微收浓'
+      ],
+      tips: ['酱底要能挂在勺子上的浓稠度，太稀的话蔬菜会泡在水里', '番茄膏炒一下可以去掉生味'],
+      warnings: ['洋葱不要炒焦，焦了会发苦']
+    },
+    {
+      id: '3',
+      title: '摆盘排列',
+      duration: '20分钟',
+      details: [
+        '准备一个圆形或椭圆形烤盘（直径约 20-25cm）',
+        '把番茄酱底均匀铺在烤盘底部，厚度约 5mm',
+        '从烤盘边缘开始，把蔬菜片竖着插进酱底里',
+        '按照「茄子-绿西葫芦-黄西葫芦-番茄」的顺序循环排列',
+        '蔬菜片之间稍微重叠一点（重叠约 1/3），这样更好看',
+        '一直排到中心，形成一个漂亮的同心圆',
+        '中心可以用卷起来的蔬菜片做个"玫瑰花"造型'
+      ],
+      tips: ['这一步最考验耐心，别着急，慢慢排', '蔬菜片要竖着插，不是平躺着放', '排列整齐出来才好看，这是这道菜的灵魂'],
+      warnings: ['蔬菜要插进酱底固定住，不然烤的时候会倒']
+    },
+    {
+      id: '4',
+      title: '调味',
+      duration: '5分钟',
+      ingredients: ['橄榄油 3大勺', '新鲜百里香 4-5枝（或干百里香 1小勺）', '盐 1/2小勺', '黑胡椒 适量'],
+      details: [
+        '把橄榄油均匀淋在所有蔬菜表面',
+        '百里香叶子摘下来，均匀撒在上面（干百里香直接撒）',
+        '再撒一层薄薄的盐和黑胡椒',
+        '如果有大蒜，可以再切几片薄片插在蔬菜缝隙里增加香味'
+      ],
+      tips: ['橄榄油要淋够，这样蔬菜才不会干', '新鲜百里香风味最佳，没有的话干的也行']
+    },
+    {
+      id: '5',
+      title: '烘烤',
+      duration: '60分钟',
+      details: [
+        '烤箱提前预热到 180°C（上下火）',
+        '用锡纸把烤盘盖住，封紧边缘',
+        '放入烤箱中层，先烤 45 分钟',
+        '45 分钟后取出，小心揭开锡纸（有热蒸汽，别烫到）',
+        '观察一下，蔬菜应该已经变软了',
+        '不盖锡纸，继续烤 15-20 分钟，让表面上色',
+        '烤到边缘微微焦糖化、表面有点金黄就可以出炉了'
+      ],
+      tips: ['每个烤箱脾气不同，最后 15 分钟要盯着看，别烤过了', '如果你的烤箱火力比较猛，可以降到 170°C'],
+      warnings: ['揭锡纸时小心蒸汽烫手', '不盖锡纸的时候不要离开厨房，容易烤焦']
+    },
+    {
+      id: '6',
+      title: '出炉装饰',
+      duration: '2分钟',
+      ingredients: ['新鲜罗勒叶 几片', '橄榄油 少许'],
+      details: [
+        '小心把烤盘从烤箱取出，放在隔热垫上',
+        '趁热再淋一点橄榄油增加光泽',
+        '撒上新鲜罗勒叶（撕碎或整片都可以）',
+        '可以现磨一点黑胡椒增加风味',
+        '直接上桌，趁热吃最好吃'
+      ],
+      tips: ['这道菜放凉了也很好吃，可以做冷菜', '配上烤好的法棍面包，蘸着酱底吃特别香']
+    }
   ],
   '五美元奶昔': [
     { id: '1', title: '准备食材', description: '香草冰淇淋3球，牛奶150ml，香草精少许', duration: '2分钟' },
@@ -931,32 +1044,121 @@ function generateVideoLinks(dishName: string): VideoTutorial[] {
   ]
 }
 
-// 默认步骤模板
-function generateDefaultSteps(dishName: string): Omit<CookingStep, 'completed'>[] {
+// 将原始数据转换为统一的详细格式
+function convertToDetailedStep(step: RawStep): Omit<CookingStep, 'completed' | 'expanded'> {
+  // 如果是新格式（有 details 数组）
+  if ('details' in step && Array.isArray(step.details)) {
+    return step as Omit<CookingStep, 'completed' | 'expanded'>
+  }
+
+  // 旧格式转换
+  const legacy = step as LegacyStep
+  return {
+    id: legacy.id,
+    title: legacy.title,
+    duration: legacy.duration,
+    details: [legacy.description],
+    tips: legacy.tips ? [legacy.tips] : undefined
+  }
+}
+
+// 获取菜品的详细步骤（自动转换旧格式）
+function getDetailedSteps(dishName: string): Omit<CookingStep, 'completed' | 'expanded'>[] {
+  const rawSteps = DETAILED_DISH_STEPS[dishName]
+  if (!rawSteps) {
+    return generateDefaultDetailedSteps(dishName)
+  }
+  return rawSteps.map(convertToDetailedStep)
+}
+
+// 默认详细步骤模板
+function generateDefaultDetailedSteps(dishName: string): Omit<CookingStep, 'completed' | 'expanded'>[] {
   return [
-    { id: '1', title: '准备食材', description: `准备制作${dishName}所需的所有食材`, duration: '10分钟' },
-    { id: '2', title: '食材处理', description: '清洗、切配所有食材', duration: '15分钟' },
-    { id: '3', title: '烹饪', description: '按照食谱步骤进行烹饪', duration: '30分钟' },
-    { id: '4', title: '摆盘', description: '装盘并进行简单装饰', duration: '5分钟' },
+    {
+      id: '1',
+      title: '准备食材',
+      duration: '10分钟',
+      details: [
+        `准备制作「${dishName}」所需的所有食材`,
+        '按照食谱清单逐一检查食材是否齐全',
+        '提前把需要解冻的食材取出解冻',
+        '准备好所需的厨具和容器'
+      ],
+      tips: ['建议先把所有食材准备好再开始烹饪', '可以参考上面的视频教程确认用量']
+    },
+    {
+      id: '2',
+      title: '食材处理',
+      duration: '15分钟',
+      details: [
+        '蔬菜类食材先清洗干净',
+        '按照食谱要求切成相应的形状和大小',
+        '肉类/海鲜去除不需要的部分，切成适当大小',
+        '调味料提前调配好，放在小碗里备用'
+      ],
+      tips: ['切菜时注意大小均匀，这样烹饪时才能熟度一致', '不确定怎么切可以参考视频教程']
+    },
+    {
+      id: '3',
+      title: '烹饪制作',
+      duration: '30分钟',
+      details: [
+        '按照食谱步骤依次进行烹饪',
+        '注意火候和时间的控制',
+        '过程中可以尝味道，根据口味调整',
+        '观察食材的颜色和状态判断是否熟透'
+      ],
+      tips: ['第一次做可以多看几遍视频教程', '不确定的地方可以暂停下来查看'],
+      warnings: ['注意安全，小心烫伤']
+    },
+    {
+      id: '4',
+      title: '摆盘出品',
+      duration: '5分钟',
+      details: [
+        '选择合适的盘子盛装',
+        '注意摆放的美观度',
+        '可以用香草、酱汁等做简单装饰',
+        '趁热享用味道最佳'
+      ],
+      tips: ['好的摆盘能增加食欲', '可以拍照记录你的作品']
+    }
   ]
 }
 
 export function StepCooking({ topic, onNext, onPrev, stepData }: StepCookingProps) {
   const existingSteps = (stepData.cooking as { cookingSteps: CookingStep[] })?.cookingSteps
 
-  // 获取菜品步骤和视频链接
-  const dishSteps = DISH_STEPS[topic.recommended_dish] || generateDefaultSteps(topic.recommended_dish)
+  // 获取详细步骤和视频链接（自动兼容旧格式）
+  const dishSteps = getDetailedSteps(topic.recommended_dish)
   const videoLinks = generateVideoLinks(topic.recommended_dish)
 
   const [steps, setSteps] = useState<CookingStep[]>(
-    existingSteps || dishSteps.map(s => ({ ...s, completed: false }))
+    existingSteps || dishSteps.map(s => ({ ...s, completed: false, expanded: false }))
   )
+  const [currentStep, setCurrentStep] = useState(0)
 
   // 切换步骤完成状态
   const toggleStep = (id: string) => {
     setSteps(prev => prev.map(s =>
       s.id === id ? { ...s, completed: !s.completed } : s
     ))
+  }
+
+  // 切换步骤展开/收起
+  const toggleExpand = (id: string) => {
+    setSteps(prev => prev.map(s =>
+      s.id === id ? { ...s, expanded: !s.expanded } : s
+    ))
+  }
+
+  // 展开当前步骤
+  const expandStep = (index: number) => {
+    setCurrentStep(index)
+    setSteps(prev => prev.map((s, i) => ({
+      ...s,
+      expanded: i === index ? true : s.expanded
+    })))
   }
 
   const completedCount = steps.filter(s => s.completed).length
@@ -988,48 +1190,148 @@ export function StepCooking({ topic, onNext, onPrev, stepData }: StepCookingProp
         </div>
       </div>
 
-      {/* 步骤列表 */}
-      <div className="space-y-3">
+      {/* 步骤列表 - 详细版 */}
+      <div className="space-y-4">
         {steps.map((step, index) => (
           <div
             key={step.id}
-            onClick={() => toggleStep(step.id)}
             className={`
-              card-elegant p-4 cursor-pointer transition-all
+              card-elegant overflow-hidden transition-all
               ${step.completed ? 'opacity-60' : ''}
+              ${currentStep === index ? 'ring-2 ring-amber-500/50' : ''}
             `}
           >
-            <div className="flex items-start gap-4">
-              {/* 步骤序号/完成状态 */}
-              <div className={`
-                w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold transition-all
-                ${step.completed
-                  ? 'bg-green-500 text-white'
-                  : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                }
-              `}>
-                {step.completed ? <Check size={16} /> : index + 1}
-              </div>
+            {/* 步骤头部 - 点击展开/收起 */}
+            <div
+              onClick={() => {
+                toggleExpand(step.id)
+                expandStep(index)
+              }}
+              className="p-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                {/* 步骤序号/完成状态 */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleStep(step.id)
+                  }}
+                  className={`
+                    w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold transition-all cursor-pointer
+                    ${step.completed
+                      ? 'bg-green-500 text-white'
+                      : 'bg-amber-500/20 text-amber-400 border-2 border-amber-500/30 hover:border-amber-500'
+                    }
+                  `}
+                >
+                  {step.completed ? <Check size={18} /> : index + 1}
+                </div>
 
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className={`font-semibold ${step.completed ? 'text-zinc-500 line-through' : 'text-white'}`}>
-                    {step.title}
-                  </h4>
-                  {step.duration && (
-                    <span className="text-xs text-zinc-500">{step.duration}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h4 className={`font-semibold text-lg ${step.completed ? 'text-zinc-500 line-through' : 'text-white'}`}>
+                      {step.title}
+                    </h4>
+                    <div className="flex items-center gap-3">
+                      {step.duration && (
+                        <span className="text-xs text-zinc-500 flex items-center gap-1">
+                          <Clock size={12} />
+                          {step.duration}
+                        </span>
+                      )}
+                      {step.expanded ? (
+                        <ChevronUp size={18} className="text-zinc-400" />
+                      ) : (
+                        <ChevronDown size={18} className="text-zinc-400" />
+                      )}
+                    </div>
+                  </div>
+                  {!step.expanded && (
+                    <p className="text-sm text-zinc-500 mt-1 truncate">
+                      {step.details[0]}...
+                    </p>
                   )}
                 </div>
-                <p className={`text-sm ${step.completed ? 'text-zinc-600' : 'text-zinc-400'}`}>
-                  {step.description}
-                </p>
-                {step.tips && !step.completed && (
-                  <p className="text-xs text-amber-400/80 mt-2 pl-3 border-l-2 border-amber-500/30">
-                    {step.tips}
-                  </p>
-                )}
               </div>
             </div>
+
+            {/* 展开后的详细内容 */}
+            {step.expanded && (
+              <div className="px-4 pb-4 pt-0 border-t border-white/5">
+                {/* 这一步需要的食材 */}
+                {step.ingredients && step.ingredients.length > 0 && (
+                  <div className="mt-4 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                    <h5 className="text-xs font-semibold text-amber-400 mb-2 uppercase tracking-wider">📦 这一步需要</h5>
+                    <div className="flex flex-wrap gap-2">
+                      {step.ingredients.map((ing, i) => (
+                        <span key={i} className="text-sm text-zinc-300 bg-white/5 px-2 py-1 rounded">
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 详细操作步骤 */}
+                <div className="mt-4">
+                  <h5 className="text-xs font-semibold text-zinc-400 mb-3 uppercase tracking-wider">📝 详细操作</h5>
+                  <ol className="space-y-3">
+                    {step.details.map((detail, i) => (
+                      <li key={i} className="flex gap-3 text-sm">
+                        <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs text-zinc-400 shrink-0">
+                          {i + 1}
+                        </span>
+                        <span className="text-zinc-300 leading-relaxed pt-0.5">{detail}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                {/* 小贴士 */}
+                {step.tips && step.tips.length > 0 && (
+                  <div className="mt-4 p-3 rounded-lg bg-green-500/5 border border-green-500/20">
+                    <h5 className="text-xs font-semibold text-green-400 mb-2 uppercase tracking-wider">💡 小贴士</h5>
+                    <ul className="space-y-1.5">
+                      {step.tips.map((tip, i) => (
+                        <li key={i} className="text-sm text-zinc-300 flex gap-2">
+                          <span className="text-green-400">•</span>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 常见错误提醒 */}
+                {step.warnings && step.warnings.length > 0 && (
+                  <div className="mt-3 p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+                    <h5 className="text-xs font-semibold text-red-400 mb-2 uppercase tracking-wider flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      注意避坑
+                    </h5>
+                    <ul className="space-y-1.5">
+                      {step.warnings.map((warning, i) => (
+                        <li key={i} className="text-sm text-zinc-300 flex gap-2">
+                          <span className="text-red-400">⚠</span>
+                          {warning}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 完成这一步按钮 */}
+                {!step.completed && (
+                  <button
+                    onClick={() => toggleStep(step.id)}
+                    className="mt-4 w-full py-2.5 rounded-lg bg-green-500/10 text-green-400 text-sm font-medium hover:bg-green-500/20 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Check size={16} />
+                    完成这一步
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
