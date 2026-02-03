@@ -17,11 +17,12 @@ RUN npm run build
 # ---- 阶段2：运行环境 ----
 FROM python:3.11-slim
 
-# 安装 nginx 和 supervisor
+# 安装 nginx、supervisor 和 envsubst
 RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     curl \
+    gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -36,15 +37,14 @@ COPY backend/ ./backend/
 # 复制前端构建产物
 COPY --from=frontend-builder /frontend/dist /var/www/html
 
-# 创建数据目录
-RUN mkdir -p /app/backend/data
+# 创建数据目录和日志目录
+RUN mkdir -p /app/backend/data /var/log/supervisor
 
-# 复制配置文件
-COPY deploy/nginx.conf /etc/nginx/sites-available/default
+# 复制配置文件（nginx.conf 作为模板）
+COPY deploy/nginx.conf /etc/nginx/nginx.conf.template
 COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY deploy/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
-# 暴露端口
-EXPOSE 80
-
-# 使用 supervisor 同时运行 nginx 和 uvicorn
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# 使用启动脚本（处理动态端口）
+CMD ["/app/start.sh"]
