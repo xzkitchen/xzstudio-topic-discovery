@@ -258,24 +258,24 @@ export function StepConfirm({ topic, onNext, stepData }: StepConfirmProps) {
         )}
       </div>
 
-      {/* 故事切入点 - 折叠展示 */}
-      <details className="card-elegant">
-        <summary className="p-4 cursor-pointer text-sm font-semibold text-zinc-400 hover:text-zinc-300 transition-colors">
+      {/* 故事切入点 */}
+      <div className="card-elegant p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
           故事切入点（{topic.story_angles.length}个）
-        </summary>
-        <div className="px-4 pb-4 space-y-2">
+        </h3>
+        <div className="space-y-2 sm:space-y-3">
           {topic.story_angles.map((angle, i) => (
-            <div key={i} className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-amber-400">{angle.angle_type}</span>
-                <span className="text-xs text-zinc-500">{angle.potential_score}分</span>
+            <div key={i} className="p-3 sm:p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center justify-between mb-1 sm:mb-2">
+                <span className="text-xs sm:text-sm text-amber-400">{angle.angle_type}</span>
+                <span className="text-xs sm:text-sm text-zinc-500">{angle.potential_score}分</span>
               </div>
-              <p className="text-sm font-medium text-white">{angle.title}</p>
-              <p className="text-xs text-zinc-400 mt-1">{angle.description}</p>
+              <p className="text-sm sm:text-base font-medium text-white">{angle.title}</p>
+              <p className="text-xs sm:text-sm text-zinc-400 mt-1">{angle.description}</p>
             </div>
           ))}
         </div>
-      </details>
+      </div>
 
       {/* 操作按钮 */}
       <div className="flex justify-center sm:justify-end">
