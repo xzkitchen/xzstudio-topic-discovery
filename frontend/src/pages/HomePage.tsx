@@ -9,6 +9,32 @@ import type { TabType } from '../components/Header'
 const PAGE_SIZE = 10
 const VALID_TABS: TabType[] = ['movie_food', 'famous_recipe', 'archaeological', 'favorites']
 
+// 列表入场动画
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+// 卡片入场动画
+const itemVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
 export function HomePage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -103,17 +129,17 @@ export function HomePage() {
           )}
         </AnimatePresence>
 
-        {/* 调试信息 */}
-        <div className="mb-4 p-4 bg-yellow-500/20 rounded-lg text-yellow-300 text-sm">
-          调试: displayedTopics.length = {displayedTopics.length},
-          activeTab = {activeTab}
-        </div>
-
-        {/* 选题列表 */}
+        {/* 选题列表 - 带入场动画 */}
         {displayedTopics.length > 0 ? (
-          <div className="grid gap-4 sm:gap-5">
+          <motion.div
+            className="grid gap-4 sm:gap-5"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            key={activeTab} // 切换标签时重新触发动画
+          >
             {displayedTopics.map((topic, index) => (
-              <div key={topic.id}>
+              <motion.div key={topic.id} variants={itemVariants}>
                 <TopicCard
                   topic={topic}
                   index={index}
@@ -121,15 +147,20 @@ export function HomePage() {
                   onSkip={handleSkip}
                   onStartWorkflow={handleStartWorkflow}
                 />
-              </div>
+              </motion.div>
             ))}
 
             {/* 加载更多按钮 */}
             {hasMore && (
-              <div className="flex justify-center mt-6">
+              <motion.div
+                className="flex justify-center mt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
                 <button
                   onClick={loadMore}
-                  className="group flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300"
+                  className="group flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
                   style={{
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid var(--border)',
@@ -148,9 +179,9 @@ export function HomePage() {
                     {visibleCount}/{allFilteredTopics.length}
                   </span>
                 </button>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         ) : (
           /* 空状态 */
           <motion.div

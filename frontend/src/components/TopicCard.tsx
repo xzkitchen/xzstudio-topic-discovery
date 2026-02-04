@@ -93,7 +93,11 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
   }
 
   return (
-    <article className="card-elegant overflow-hidden">
+    <motion.article
+      className="card-elegant overflow-hidden"
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileTap={{ scale: 0.995 }}
+    >
       {/* 顶部区域：海报 + 基础信息 */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5">
         {/* 海报/封面 - 根据类型显示不同样式 */}
@@ -546,6 +550,6 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
           })}
         </span>
       </div>
-    </article>
+    </motion.article>
   )
 }
