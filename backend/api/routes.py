@@ -103,18 +103,35 @@ async def trigger_collect():
 
 @router.get("/topics")
 async def get_topics(limit: int = None) -> List[Dict[str, Any]]:
-    """获取选题候选列表（完整数据）"""
+    """获取选题候选列表（完整数据，含海报）"""
     topics = await collector.collect_topics(max_count=limit)
 
     # 获取收藏状态
     favorites = await get_favorites()
     favorite_ids = set(favorites)
 
-    # 标记收藏状态
-    for topic in topics:
+    # 标记收藏状态，并为影视美食获取海报
+    async def enrich_topic(topic: Dict[str, Any]) -> Dict[str, Any]:
         topic["is_favorited"] = topic.get("id") in favorite_ids
 
-    return topics
+        # 为影视美食类型获取 TMDB 海报
+        if topic.get("topic_type") == "movie_food" and not topic.get("poster_url"):
+            if collector.tmdb:
+                try:
+                    poster_url = await collector.tmdb.get_movie_poster(
+                        topic.get("work_name", ""),
+                        topic.get("release_year"),
+                        topic.get("english_name")
+                    )
+                    topic["poster_url"] = poster_url
+                except Exception:
+                    topic["poster_url"] = None
+
+        return topic
+
+    # 并发获取所有海报
+    enriched_topics = await asyncio.gather(*[enrich_topic(t) for t in topics])
+    return list(enriched_topics)
 
 
 @router.get("/topics/formatted")

@@ -35,10 +35,12 @@ class TopicCandidate(BaseModel):
 
     # 作品信息（影视美食用）
     work_name: str  # 作品名
+    english_name: Optional[str] = None  # 英文名（用于 TMDB 搜索）
     work_type: str  # 电影/剧集/动漫/游戏
     douban_score: Optional[float] = None
     douban_url: Optional[str] = None
     release_year: Optional[int] = None
+    poster_url: Optional[str] = None  # TMDB 海报 URL
 
     # 美食场景
     food_scene_description: str  # 美食场景描述
