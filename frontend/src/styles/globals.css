@@ -223,6 +223,12 @@ body::after {
     z-index: 1;
   }
 
+  /* 确保卡片内容在伪元素之上 */
+  .card-elegant > * {
+    position: relative;
+    z-index: 2;
+  }
+
   /* 卡片光泽层 */
   .card-elegant::before {
     content: '';
