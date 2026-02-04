@@ -150,11 +150,7 @@ export function HomePage() {
 
             {/* 加载更多按钮 */}
             {hasMore && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex justify-center mt-6"
-              >
+              <div className="flex justify-center mt-6">
                 <button
                   onClick={loadMore}
                   className="group flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300"
@@ -176,9 +172,9 @@ export function HomePage() {
                     {visibleCount}/{allFilteredTopics.length}
                   </span>
                 </button>
-              </motion.div>
+              </div>
             )}
-          </motion.div>
+          </div>
         ) : (
           /* 空状态 */
           <motion.div
