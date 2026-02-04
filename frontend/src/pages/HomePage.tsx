@@ -129,19 +129,16 @@ export function HomePage() {
 
         {/* 选题列表 */}
         {displayedTopics.length > 0 ? (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid gap-4 sm:gap-5"
-          >
+          <div className="grid gap-4 sm:gap-5">
             <AnimatePresence mode="popLayout">
               {displayedTopics.map((topic, index) => (
                 <motion.div
                   key={topic.id}
-                  variants={itemVariants}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
                   layout
-                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 >
                   <TopicCard
                     topic={topic}

@@ -93,17 +93,7 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
   }
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, transition: { duration: 0.15 } }}
-      transition={{
-        duration: 0.3,
-        delay: Math.min(index * 0.03, 0.3),  // 限制最大延迟为0.3秒
-        ease: 'easeOut'
-      }}
-      className="card-elegant overflow-hidden"
-    >
+    <article className="card-elegant overflow-hidden">
       {/* 顶部区域：海报 + 基础信息 */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5">
         {/* 海报/封面 - 根据类型显示不同样式 */}
@@ -556,6 +546,6 @@ export function TopicCard({ topic, index, onToggleFavorite, onSkip, onStartWorkf
           })}
         </span>
       </div>
-    </motion.article>
+    </article>
   )
 }
