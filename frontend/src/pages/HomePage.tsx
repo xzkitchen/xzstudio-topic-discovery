@@ -127,29 +127,26 @@ export function HomePage() {
           )}
         </AnimatePresence>
 
+        {/* 调试信息 */}
+        <div className="mb-4 p-4 bg-yellow-500/20 rounded-lg text-yellow-300 text-sm">
+          调试: displayedTopics.length = {displayedTopics.length},
+          activeTab = {activeTab}
+        </div>
+
         {/* 选题列表 */}
         {displayedTopics.length > 0 ? (
           <div className="grid gap-4 sm:gap-5">
-            <AnimatePresence mode="popLayout">
-              {displayedTopics.map((topic, index) => (
-                <motion.div
-                  key={topic.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
-                  layout
-                >
-                  <TopicCard
-                    topic={topic}
-                    index={index}
-                    onToggleFavorite={toggleFavorite}
-                    onSkip={handleSkip}
-                    onStartWorkflow={handleStartWorkflow}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {displayedTopics.map((topic, index) => (
+              <div key={topic.id}>
+                <TopicCard
+                  topic={topic}
+                  index={index}
+                  onToggleFavorite={toggleFavorite}
+                  onSkip={handleSkip}
+                  onStartWorkflow={handleStartWorkflow}
+                />
+              </div>
+            ))}
 
             {/* 加载更多按钮 */}
             {hasMore && (
