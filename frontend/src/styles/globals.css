@@ -214,77 +214,17 @@ body::after {
 
 /* ==================== 组件层 ==================== */
 @layer components {
-  /* 高级感卡片 */
+  /* 高级感卡片 - 简化版 */
   .card-elegant {
     @apply relative overflow-hidden rounded-2xl;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 1;
-  }
-
-  /* 确保卡片内容在伪元素之上 */
-  .card-elegant > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* 卡片光泽层 */
-  .card-elegant::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.03) 0%,
-      transparent 50%,
-      transparent 100%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* 卡片边框渐变效果 */
-  .card-elegant::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--accent-rgb), 0.2) 0%,
-      transparent 30%,
-      transparent 70%,
-      rgba(var(--accent-rgb), 0.1) 100%
-    );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
+    transition: all 0.3s ease;
   }
 
   .card-elegant:hover {
     border-color: var(--border-hover);
-    transform: translateY(-2px);
-    box-shadow:
-      0 20px 50px -15px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(var(--accent-rgb), 0.05),
-      0 0 40px -20px rgba(var(--accent-rgb), 0.15);
-  }
-
-  .card-elegant:hover::before {
-    opacity: 1;
-  }
-
-  .card-elegant:hover::after {
-    opacity: 1;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
 
   /* 毛玻璃卡片 */
