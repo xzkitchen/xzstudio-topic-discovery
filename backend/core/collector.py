@@ -3213,6 +3213,42 @@ CURATED_TOPICS = [
         'is_discussable': True,
         'has_momentum': True,
         'cooking_difficulty': '简单',
+    },
+    {
+        'id': 'garfield-lasagna-01',
+        'topic_type': 'movie_food',
+        'work_name': '加菲猫',
+        'english_name': 'Garfield',
+        'work_type': '电影',
+        'douban_score': 7.8,
+        'release_year': 2004,
+        'douban_url': 'https://movie.douban.com/subject/1308776/',
+        'food_scene_description': '加菲猫从高处掉下来，掉进一辆装满千层面的卡车里，毫发无损。经典台词："Once again, my life has been saved by the miracle of lasagna."',
+        'food_scene_timestamp': '约 0:45:00',
+        'recommended_dish': '意大利千层面',
+        'dish_origin': '古罗马就有类似的 lasanum，19世纪末意大利移民带到美国后，从节日菜变成日常 comfort food',
+        'story_angles': [
+            {'angle_type': '演员幕后', 'title': '创作者的小后悔', 'description': 'Jim Davis 自己爱吃千层面所以让加菲猫也爱吃，后来说"早知道让他爱吃披萨，披萨比千层面好画多了"', 'potential_score': 8},
+            {'angle_type': '其他', 'title': '加菲猫的出生设定', 'description': '漫画设定中加菲猫出生在意大利餐厅 Mamma Leoni\'s，从小吃千层面，餐厅老板被吃穷了只好把他卖到宠物店', 'potential_score': 7},
+            {'angle_type': '菜品历史', 'title': '千层面的阶级跃迁', 'description': '从意大利移民的节日菜到美国日常 comfort food，肉价变便宜改变了一道菜的命运', 'potential_score': 7}
+        ],
+        'backup_angles': [
+            {'angle_type': '其他', 'title': '全球最强千层面代言人', 'description': '加菲猫漫画在 2700+ 报纸连载，110+ 国家发行超 1300 万册，让千层面成为全球符号', 'potential_score': 6}
+        ],
+        'opening_hooks': [
+            {'type': '名场面', 'content': '一只猫从高处掉下来，被一卡车千层面救了命'},
+            {'type': '认知冲突', 'content': '加菲猫之父说：早知道让他爱吃披萨，披萨比千层面好画多了'},
+            {'type': '反差跃迁', 'content': '一只漫画猫，让全世界都记住了千层面这道菜'}
+        ],
+        'footage_sources': ['2004电影原片', '2024动画版', '漫画素材'],
+        'footage_available': True,
+        'cooking_difficulty': '中等',
+        'cooking_notes': '经典肉酱千层面，需要做肉酱+白酱+组装烤制，步骤多但不难',
+        'visual_complexity': '高',
+        'is_interesting': True,
+        'is_discussable': True,
+        'has_momentum': False,
+        'heat_reason': None,
     }
 ]
 
