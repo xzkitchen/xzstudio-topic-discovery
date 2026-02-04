@@ -168,3 +168,12 @@ def get_tmdb_client(api_key: str) -> TMDBClient:
     if _tmdb_client is None:
         _tmdb_client = TMDBClient(api_key)
     return _tmdb_client
+
+
+async def close_tmdb_client():
+    """关闭 TMDB 客户端，释放资源"""
+    global _tmdb_client
+    if _tmdb_client is not None:
+        await _tmdb_client.close()
+        _tmdb_client = None
+        logger.info("TMDB 客户端已关闭")

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Literal, Optional
 from datetime import datetime
+import asyncio
 
 from ..core.collector import TopicCollector, CURATED_TOPICS
 from ..data.ingredients import get_ingredients
@@ -49,7 +50,8 @@ router = APIRouter(prefix="/api", tags=["topics"])
 
 collector = TopicCollector()
 
-# 状态跟踪
+# 状态跟踪（使用 Lock 保护并发访问）
+_discovery_lock = asyncio.Lock()
 discovery_status = {
     "is_running": False,
     "last_run": None,
@@ -66,10 +68,10 @@ async def get_status():
 @router.post("/collect")
 async def trigger_collect():
     """收集选题候选（返回完整数据）"""
-    if discovery_status["is_running"]:
-        raise HTTPException(status_code=409, detail="收集任务正在运行中")
-
-    discovery_status["is_running"] = True
+    async with _discovery_lock:
+        if discovery_status["is_running"]:
+            raise HTTPException(status_code=409, detail="收集任务正在运行中")
+        discovery_status["is_running"] = True
 
     try:
         # 获取所有符合条件的选题
@@ -83,8 +85,9 @@ async def trigger_collect():
         for topic in topics:
             topic["is_favorited"] = topic.get("id") in favorite_ids
 
-        discovery_status["last_run"] = datetime.now().isoformat()
-        discovery_status["last_count"] = len(topics)
+        async with _discovery_lock:
+            discovery_status["last_run"] = datetime.now().isoformat()
+            discovery_status["last_count"] = len(topics)
 
         return {
             "status": "success",
@@ -94,7 +97,8 @@ async def trigger_collect():
             "message": f"收集完成！{len(topics)}个选题已准备好"
         }
     finally:
-        discovery_status["is_running"] = False
+        async with _discovery_lock:
+            discovery_status["is_running"] = False
 
 
 @router.get("/topics")

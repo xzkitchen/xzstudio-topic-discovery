@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { TopicCandidate, DiscoveryStatus, SkipReason } from '../types'
 
 export function useTopics() {
   // 发现池：当前展示的5个选题
   const [discoveryTopics, setDiscoveryTopics] = useState<TopicCandidate[]>([])
+  // 用于取消待处理的刷新请求
+  const pendingRefreshRef = useRef<number | null>(null)
   // 收藏池：用户收藏的选题（持久保存）
   const [favoriteTopics, setFavoriteTopics] = useState<TopicCandidate[]>([])
 
@@ -154,8 +156,14 @@ export function useTopics() {
       // 先从本地移除，然后刷新获取新的5个选题（自动补充）
       setDiscoveryTopics(prev => prev.filter(t => t.id !== topic.id))
 
+      // 取消之前待处理的刷新请求
+      if (pendingRefreshRef.current !== null) {
+        clearTimeout(pendingRefreshRef.current)
+      }
+
       // 异步刷新发现池，补充新选题
-      setTimeout(() => {
+      pendingRefreshRef.current = window.setTimeout(() => {
+        pendingRefreshRef.current = null
         fetchDiscoveryTopics()
       }, 300) // 短暂延迟让UI动画完成
 
@@ -200,6 +208,13 @@ export function useTopics() {
     fetchDiscoveryTopics()
     fetchFavoriteTopics()
     fetchStatus()
+
+    // 清理：组件卸载时取消待处理的刷新请求
+    return () => {
+      if (pendingRefreshRef.current !== null) {
+        clearTimeout(pendingRefreshRef.current)
+      }
+    }
   }, [fetchDiscoveryTopics, fetchFavoriteTopics, fetchStatus])
 
   return {

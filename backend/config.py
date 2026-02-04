@@ -5,7 +5,7 @@ from typing import List
 
 class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
-    TMDB_API_KEY: str = "5e9db32563dd5e00d90859ae2689f3c2"  # TMDB 海报 API
+    TMDB_API_KEY: str = ""  # 从环境变量 TMDB_API_KEY 读取
     DATABASE_PATH: Path = Path("data/topics.db")
     DOUBAN_DELAY: float = 2.0  # 请求间隔，避免被ban
 

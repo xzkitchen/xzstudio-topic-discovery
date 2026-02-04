@@ -1,13 +1,37 @@
 import { useMemo, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, AlertCircle, Heart, Sparkles } from 'lucide-react'
 import { Header, TopicCard } from '../components'
 import { useTopics } from '../hooks/useTopics'
 import type { TabType } from '../components/Header'
 
 const PAGE_SIZE = 10
 const VALID_TABS: TabType[] = ['movie_food', 'famous_recipe', 'archaeological', 'favorites']
+
+// 入场动画变体
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -72,7 +96,7 @@ export function HomePage() {
   const handleSkip = activeTab === 'favorites' ? skipFavoriteTopic : skipTopic
 
   return (
-    <>
+    <div className="relative min-h-screen">
       {/* Header */}
       <Header
         lastUpdate={status.last_run}
@@ -88,11 +112,16 @@ export function HomePage() {
         <AnimatePresence>
           {error && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20"
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              className="mb-6 p-4 rounded-xl flex items-start gap-3"
+              style={{
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.15)'
+              }}
             >
+              <AlertCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
               <p className="text-sm text-red-400">{error}</p>
             </motion.div>
           )}
@@ -100,64 +129,128 @@ export function HomePage() {
 
         {/* 选题列表 */}
         {displayedTopics.length > 0 ? (
-          <div className="grid gap-4 sm:gap-5">
-            {displayedTopics.map((topic, index) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                index={index}
-                onToggleFavorite={toggleFavorite}
-                onSkip={handleSkip}
-                onStartWorkflow={handleStartWorkflow}
-              />
-            ))}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid gap-4 sm:gap-5"
+          >
+            <AnimatePresence mode="popLayout">
+              {displayedTopics.map((topic, index) => (
+                <motion.div
+                  key={topic.id}
+                  variants={itemVariants}
+                  layout
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                >
+                  <TopicCard
+                    topic={topic}
+                    index={index}
+                    onToggleFavorite={toggleFavorite}
+                    onSkip={handleSkip}
+                    onStartWorkflow={handleStartWorkflow}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {/* 加载更多按钮 */}
             {hasMore && (
-              <motion.button
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                onClick={loadMore}
-                className="mt-4 mx-auto flex items-center gap-2 px-6 py-3 rounded-xl transition-all"
-                style={{
-                  background: 'var(--border)',
-                  color: 'var(--text-secondary)'
-                }}
+                className="flex justify-center mt-6"
               >
-                <span>加载更多</span>
-                <ChevronDown size={16} />
-                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                  ({visibleCount}/{allFilteredTopics.length})
-                </span>
-              </motion.button>
+                <button
+                  onClick={loadMore}
+                  className="group flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <span>加载更多</span>
+                  <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-md"
+                    style={{
+                      background: 'var(--border)',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    {visibleCount}/{allFilteredTopics.length}
+                  </span>
+                </button>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         ) : (
+          /* 空状态 */
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center justify-center py-20 sm:py-32"
           >
-            <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-              {activeTab === 'favorites' ? '还没有收藏任何选题' : '该分类暂无选题'}
-            </p>
-            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
-              {activeTab === 'favorites' ? '点击选题卡片上的 ❤️ 来收藏' : '试试其他分类吧'}
+            {/* 图标 */}
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-soft), rgba(var(--accent-rgb), 0.02))',
+                border: '1px solid rgba(var(--accent-rgb), 0.1)'
+              }}
+            >
+              {activeTab === 'favorites' ? (
+                <Heart size={32} style={{ color: 'var(--accent)' }} />
+              ) : (
+                <Sparkles size={32} style={{ color: 'var(--accent)' }} />
+              )}
+            </div>
+
+            {/* 文案 */}
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+              {activeTab === 'favorites' ? '还没有收藏选题' : '暂无选题'}
+            </h3>
+            <p className="text-sm text-center max-w-xs" style={{ color: 'var(--text-muted)' }}>
+              {activeTab === 'favorites'
+                ? '浏览选题时，点击卡片上的心形图标即可收藏'
+                : '当前分类暂无可用选题，试试其他分类吧'
+              }
             </p>
           </motion.div>
         )}
       </main>
 
       {/* Footer */}
-      <footer
-        className="relative max-w-6xl mx-auto px-4 py-6 mt-6 sm:px-6 sm:py-8 sm:mt-8"
-        style={{ borderTop: '1px solid var(--border)' }}
-      >
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-center sm:text-left" style={{ color: 'var(--text-muted)' }}>
-          <p>XZstudio v3.0</p>
-          <p>数据来源: 影视美食 · 名店配方 · 考古美食</p>
+      <footer className="relative max-w-6xl mx-auto px-4 py-8 mt-8 sm:px-6 sm:py-12 sm:mt-12">
+        {/* 顶部分割线 */}
+        <div className="divider mb-8" />
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          {/* 品牌 */}
+          <div className="flex items-center gap-3">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{
+                background: 'var(--accent-soft)',
+                border: '1px solid rgba(var(--accent-rgb), 0.1)'
+              }}
+            >
+              <Sparkles size={14} style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <p className="font-medium" style={{ color: 'var(--text-secondary)' }}>XZstudio</p>
+              <p style={{ color: 'var(--text-muted)' }}>v3.0</p>
+            </div>
+          </div>
+
+          {/* 数据来源 */}
+          <p style={{ color: 'var(--text-muted)' }}>
+            数据来源: 影视美食 · 名店配方 · 考古美食
+          </p>
         </div>
       </footer>
-    </>
+    </div>
   )
 }

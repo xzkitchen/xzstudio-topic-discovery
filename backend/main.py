@@ -1,11 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 import os
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from .api.routes import router
-from .models.database import init_db
+from .models.database import init_db, close_db
+from .scrapers.tmdb import close_tmdb_client
+
+# 速率限制器
+limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
 
 # 配置日志
 logging.basicConfig(
@@ -34,8 +43,10 @@ async def lifespan(app: FastAPI):
     await init_db()
     logging.info("数据库初始化完成")
     yield
-    # 关闭时清理（如果需要）
-    logging.info("应用关闭")
+    # 关闭时清理资源
+    await close_tmdb_client()
+    await close_db()
+    logging.info("应用关闭，资源已释放")
 
 
 app = FastAPI(
@@ -45,12 +56,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# 配置速率限制
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_cors_origins(),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
 )
 
 # 注册路由
